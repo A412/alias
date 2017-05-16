@@ -1,0 +1,11 @@
+[alias]
+	slog = log --oneline
+	glog = log --pretty=format:'%C(yellow)%h%Creset %s %C(blue)%an %C(cyan)%ad%C(green)%d' --graph --date=format:%m-%d-%y|%I:%M%p
+	ignore = !git rm -r --quiet --cached . && git add .
+	cm = !git add -A && git commit -m
+	stat = !f(){ git diff --stat HEAD~${1:-0};}; f
+	tree = !f(){ git ls-tree --full-tree --name-only -r ${1:-HEAD};}; f
+	cma = !git add -A && git commit --amend --no-edit
+	undo = !f(){ git reset --hard HEAD~${1:-1};}; f
+	rbi = !f(){ git rebase -i HEAD~$1; }; f
+	cid = rev-parse --short HEAD 
