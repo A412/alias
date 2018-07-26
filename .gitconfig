@@ -1,11 +1,39 @@
 [alias]
+	# log
 	slog = log --oneline
 	glog = log --pretty=format:'%C(yellow)%h%Creset %s %C(blue)%an %C(cyan)%ad%C(green)%d' --graph --date=format:%m-%d-%y|%I:%M%p
-	ignore = !git rm -r --quiet --cached . && git add .
-	cm = !git add -A && git commit -m
-	stat = !f(){ git diff --stat HEAD~${1:-0};}; f
-	tree = !f(){ git ls-tree --full-tree --name-only -r ${1:-HEAD};}; f
-	cma = !git add -A && git commit --amend --no-edit
-	undo = !f(){ git reset --hard HEAD~${1:-1};}; f
-	rbi = !f(){ git rebase -i HEAD~$1; }; f
-	cid = rev-parse --short HEAD 
+
+	# commit
+	cm = !git add -A && git commit -m # commit
+	cma = !git add -A && git commit --amend --no-edit # commit amend
+	cmae = commit --amend -m # commit amend edit
+
+	# branch
+	lc = "!f() { git checkout $1 || git checkout -b $1; }; f" # local checkout
+	lcc = "!f() { git lc $1 && git clean -dfx; }; f" # local clean checkout
+	rc = "!f() { git lc $1 && git pull origin $1; }; f" # remote checkout
+	rcc = "!f() { git rc $1 && git clean -dfx; }; f" # remote clean checkout
+	attach = "!f() { git branch -f $1 HEAD && git checkout $1; }; f" # move branch $1 to point to HEAD, then switch
+
+	# remote
+	poh = push origin HEAD # push HEAD to origin
+	pohf = push origin -f HEAD # force push HEAD to origin
+
+	# history
+	rbi = "!f(){ git rebase -i HEAD~$1; }; f" # interactive rebase
+	rbc = !git add -A && git rebase --continue # continue rebase
+	rba = rebase --abort # abort rebase
+	rbs = rebase --skip # skip rebase
+	squash = "!f() { CID=$(git cid); git reset --soft $(git mrca $1); git commit --edit -m \"$(git log --format=\"* %B\" --reverse HEAD..$CID)\"; }; f" # squash to branch $1
+
+	# misc
+	ignore = !git rm -r --quiet --cached . && git add . # process all files back through .gitignore
+	undo = "!f(){ git reset --hard HEAD~${1:-1} && git clean -dfx; }; f" # go back $1 commits
+
+	# info
+	bid = rev-parse --abbrev-ref HEAD # branch ID
+	cid = rev-parse --short HEAD # commmit ID
+	cfind = "!f() { git log --grep="^$1"; }; f" # find log for commit
+	mrca = merge-base HEAD # most recent common ancestor
+	stat = "!f(){ git diff --stat HEAD~${1:-0};}; f" # difference between current and $1 commits ago
+	tree = "!f(){ git ls-tree --full-tree --name-only -r ${1:-HEAD};}; f" # treeview
