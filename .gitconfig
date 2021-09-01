@@ -3,17 +3,22 @@
 	slog = log --oneline
 	glog = log --pretty=format:'%C(yellow)%h%Creset %s %C(blue)%an %C(cyan)%ad%C(green)%d' --graph --date=format:%m-%d-%y|%I:%M%p
 
+	# remove
+	rmc = rm --cached
+
 	# commit
-	cm = !git add -A && git commit -m # commit
-	cma = !git add -A && git commit --amend --no-edit # commit amend
-	cmae = commit --amend -m # commit amend edit
+	cm = !git add -A && git commit --allow-empty -m # commit
+        cma = !git add -A && git commit --amend --no-edit # commit amend
+	cmae = !git add -A && git commit --amend  # commit amend edit
 
 	# branch
 	lc = "!f() { git checkout $1 || git checkout -b $1; }; f" # local checkout
 	lcc = "!f() { git lc $1 && git clean -dfx; }; f" # local clean checkout
-	rc = "!f() { git lc $1 && git pull origin $1; }; f" # remote checkout
+	rc = "!f() { git lc $1 && git fetch origin $1 && git reset --hard origin/$1; }; f" # remote checkout
 	rcc = "!f() { git rc $1 && git clean -dfx; }; f" # remote clean checkout
 	attach = "!f() { git branch -f $1 HEAD && git checkout $1; }; f" # move branch $1 to point to HEAD, then switch
+	clean-merged = !git branch --merged | ag -v master | xargs git branch -d
+	cp = cherry-pick -x -s
 
 	# remote
 	poh = push origin HEAD # push HEAD to origin
@@ -37,3 +42,5 @@
 	mrca = merge-base HEAD # most recent common ancestor
 	stat = "!f(){ git diff --stat HEAD~${1:-0};}; f" # difference between current and $1 commits ago
 	tree = "!f(){ git ls-tree --full-tree --name-only -r ${1:-HEAD};}; f" # treeview
+	mainbranch = "!echo develop"
+        bstatus = !git slog ${1:-$(git mainbranch)}.. && git diff --stat $(git mrca ${1:-$(git mainbranch)})
